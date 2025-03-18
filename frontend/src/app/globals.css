@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-background text-foreground;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4d3b72;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8a2be2;
+}
+
+/* Code syntax highlighting */
+code {
+  font-family: "Fira Code", "JetBrains Mono", monospace;
+}
+
+/* Pulse animation for buttons */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px #4d3b72;
+  }
+  50% {
+    box-shadow: 0 0 15px #8a2be2;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Focus mode */
+.focus-mode {
+  position: relative;
+}
+
+.focus-mode::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
+}
+
+.focus-mode > * {
+  position: relative;
+  z-index: 20;
+}
