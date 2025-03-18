@@ -6,7 +6,7 @@ const orbitron = Orbitron({ subsets: ["latin"], weight: ["400", "700"] });
 const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata: Metadata = {
-  title: "Repamind",
+  title: "RepoMind",
   description: "Understand any codebase in minutes, not days.",
 };
 

@@ -4,11 +4,10 @@ import { useState, useRef, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { FileCode, Send, Settings, X } from "lucide-react"
+import { FileCode, Send, Settings, X, XCircle } from "lucide-react"
 import { ChatMessage } from "@/components/chat-message"
-import { Message } from "@/types/message"
+import type { Message } from "@/types/message"
 import { FileTree } from "@/components/file-tree"
-import { CommandPalette } from "@/components/command-palette"
 
 // Mock file structure for demo
 const mockFileStructure = {
@@ -64,7 +63,6 @@ export default function ChatPage() {
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -76,18 +74,6 @@ export default function ChatPage() {
     scrollToBottom()
   }, [messages])
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Command palette shortcut (Cmd/Ctrl + K)
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault()
-        setIsCommandPaletteOpen(true)
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return
@@ -220,41 +206,53 @@ export async function connectToDatabase() {
     }, 2000)
   }
 
+  const handleCloseRepository = () => {
+    // Redirect to the main page
+    window.location.href = "/"
+  }
+
   return (
-    <main className="flex h-screen bg-[#121212] text-[#F8F8F8] overflow-hidden">
-      {/* Command Palette */}
-      {isCommandPaletteOpen && <CommandPalette onClose={() => setIsCommandPaletteOpen(false)} />}
+    <main className="flex h-screen bg-[#121212] text-[#F8F8F8] overflow-hidden relative">
+      {/* Gradient background for the entire app */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#8A2BE2]/10 via-[#121212] to-[#9F5FFF]/10 pointer-events-none z-0"></div>
 
       {/* Sidebar */}
-      <div className={`border-r border-[#2D2D2D] transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-0"}`}>
+      <div
+        className={`border-r border-[#2D2D2D] transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-0"} relative overflow-hidden`}
+      >
         {isSidebarOpen && (
-          <div className="h-full flex flex-col">
-            <div className="p-4 border-b border-[#2D2D2D] flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-2 h-2 rounded-full bg-[#8A2BE2] mr-2"></div>
-                <h2 className="font-display text-sm font-medium">Repository Files</h2>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-[#A0A0A0] hover:text-[#F8F8F8]"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+          <>
+            {/* Gradient background with transparency */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#8A2BE2]/10 to-[#9F5FFF]/5 backdrop-blur-sm z-0"></div>
 
-            <div className="flex-1 overflow-y-auto p-2">
-              <FileTree structure={mockFileStructure} />
+            <div className="h-full flex flex-col relative z-10">
+              <div className="p-4 border-b border-[#2D2D2D]/80 flex items-center justify-between backdrop-blur-sm bg-[#121212]/70">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 rounded-full bg-[#8A2BE2] mr-2"></div>
+                  <h2 className="font-display text-sm font-medium">Repository Files</h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-[#A0A0A0] hover:text-[#F8F8F8]"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-2 bg-[#121212]/50 backdrop-blur-sm">
+                <FileTree structure={mockFileStructure} />
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col h-full relative z-10">
         {/* Header */}
-        <div className="border-b border-[#2D2D2D] p-4 flex items-center justify-between">
+        <div className="border-b border-[#2D2D2D]/80 p-4 flex items-center justify-between backdrop-blur-sm bg-[#121212]/70">
           <div className="flex items-center">
             {!isSidebarOpen && (
               <Button
@@ -278,20 +276,18 @@ export async function connectToDatabase() {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-[#A0A0A0] hover:text-[#F8F8F8]"
-              onClick={() => setIsCommandPaletteOpen(true)}
+              size="sm"
+              className="mr-2 text-[#A0A0A0] hover:text-[#F8F8F8] hover:bg-[#2D2D2D]/50 border border-[#2D2D2D]/50"
+              onClick={handleCloseRepository}
             >
-              <span className="text-xs mr-1">⌘</span>K
-            </Button>
-            <Button variant="ghost" size="icon" className="ml-2 h-8 w-8 text-[#A0A0A0] hover:text-[#F8F8F8]">
-              <Settings className="h-5 w-5" />
+              <XCircle className="h-4 w-4 mr-1" />
+              Close Repository
             </Button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-[#121212]/40 backdrop-blur-[2px]">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
@@ -309,7 +305,7 @@ export async function connectToDatabase() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-[#2D2D2D] p-4">
+        <div className="border-t border-[#2D2D2D]/80 p-4 backdrop-blur-sm bg-[#121212]/70">
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -321,7 +317,7 @@ export async function connectToDatabase() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask about the codebase..."
-              className="pr-12 py-6 bg-[#2D2D2D] border-[#4D3B72] focus:border-[#9F5FFF] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all duration-300"
+              className="pr-12 py-6 bg-[#2D2D2D]/80 border-[#4D3B72] focus:border-[#9F5FFF] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all duration-300 backdrop-blur-sm"
             />
             <Button
               type="submit"
@@ -334,7 +330,7 @@ export async function connectToDatabase() {
           </form>
           <p className="mt-2 text-[#A0A0A0] text-xs">
             Press <kbd className="px-1 py-0.5 bg-[#2D2D2D] rounded text-[#A0A0A0]">Enter</kbd> to send,{" "}
-            <kbd className="px-1 py-0.5 bg-[#2D2D2D] rounded text-[#A0A0A0]">⌘K</kbd> for command palette
+            <kbd className="px-1 py-0.5 bg-[#2D2D2D] rounded text-[#A0A0A0]">Shift + Enter</kbd> for a new line.
           </p>
         </div>
       </div>
